@@ -174,7 +174,7 @@ int main() {
     cudaEventDestroy( stop );
 
     //save the output image
-    imwrite("gpu2.jpg", out_img);
+    imwrite("gpu3.jpg", out_img);
 
     return 0;
 }
