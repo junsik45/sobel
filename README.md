@@ -1,9 +1,9 @@
 [//]: # (Image References)
 
-[image1]: ./outputs/cpu.jpg
-[image2]: ./outputs/gpu1.jpg
-[image3]: ./outputs/gpu2.jpg
-[image4]: ./outputs/gpu3.jpg
+[image1]: ./cpu.jpg
+[image2]: ./gpu1.jpg
+[image3]: ./gpu2.jpg
+[image4]: ./gpu3.jpg
 [image5]: ./outputs/opencv.jpg
 [image6]: ./test01.jpg
 
