@@ -38,36 +38,53 @@ __global__ void sobelGpu(
     __shared__ unsigned char sharedMem[TILE_SIZE + 2][TILE_SIZE + 2];
 
     // Compute global pixel coordinates
-    int x = blockIdx.x * TILE_SIZE + threadIdx.x;
-    int y = blockIdx.y * TILE_SIZE + threadIdx.y;
+    int x = blockIdx.x * blockDim.x + threadIdx.x;
+    int y = blockIdx.y * blockDim.y + threadIdx.y;
 
+    int local_x = threadIdx.x + 1;  // Offset by 1 for halo region
+    int local_y = threadIdx.y + 1;
     // Load data into shared memory (avoid out-of-bounds reads)
     if (x < imgW && y < imgH) {
-        sharedMem[threadIdx.y][threadIdx.x] = input[y * imgW + x];
-    } else {
-        sharedMem[threadIdx.y][threadIdx.x] = 0;  // Handle out-of-bounds
+        sharedMem[local_y][local_x] = input[y * imgW + x];
     }
-
+    // Load halo region
+    // Top edge
+    if (threadIdx.y == 0 && y > 0) {
+        sharedMem[0][local_x] = input[(y - 1) * imgW + x];
+    }
+    // Bottom edge
+    if (threadIdx.y == blockDim.y - 1 && y < imgH - 1) {
+        sharedMem[local_y + 1][local_x] = input[(y + 1) * imgW + x];
+    }
+    // Left edge
+    if (threadIdx.x == 0 && x > 0) {
+        sharedMem[local_y][0] = input[y * imgW + (x - 1)];
+    }
+    // Right edge
+    if (threadIdx.x == blockDim.x - 1 && x < imgW - 1) {
+        sharedMem[local_y][local_x + 1] = input[y * imgW + (x + 1)];
+    }
+    
     __syncthreads();  // Synchronize threads to ensure data is loaded
 
     // Compute Sobel only if inside the valid region (excluding edges)
-    if (threadIdx.x >= 1 && threadIdx.x < TILE_SIZE + 1 && threadIdx.y >= 1 && threadIdx.y < TILE_SIZE + 1) {
+    // Compute Sobel only for valid pixels
+    if (x < imgW && y < imgH) {
         int Gx = 0, Gy = 0;
-
+        
         // Apply Sobel kernel
         for (int i = -1; i <= 1; i++) {
             for (int j = -1; j <= 1; j++) {
-                int pixel = sharedMem[threadIdx.y + i][threadIdx.x + j];
+                int pixel = sharedMem[local_y + i][local_x + j];
                 Gx += d_sobel_x[(i + 1) * SOBEL_FILTER_SIZE + (j + 1)] * pixel;
                 Gy += d_sobel_y[(i + 1) * SOBEL_FILTER_SIZE + (j + 1)] * pixel;
             }
         }
-
+        
         // Compute final edge magnitude
         int sum = min(255, abs(Gx) + abs(Gy));
-
         // Write to output
-        output[y * imgW + x] = sum;
+        output[y * imgW + x] = static_cast<unsigned char>(sum);
     }
 }
 // the main function
