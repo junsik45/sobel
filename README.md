@@ -56,7 +56,7 @@ Size: 599 x 393
 
 * GPU implementation with organized dimensions and with shmem:
 
-`blocks((int)((imgW+31)/32),(int)(g_imgHeight+31)/32);`
+`blocks((int)((imgW+15)/16),(int)(g_imgHeight+15)/16);`
 `threads(16, 16);`
 
 ![alt text][image4]

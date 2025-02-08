@@ -164,8 +164,8 @@ int main() {
     //dim3 blocksPerGrid((imgW + threadsPerBlock.x - 1) / threadsPerBlock.x, (imgH + threadsPerBlock.y - 1) / threadsPerBlock.y);
 
     //define the dimentions
-    dim3 blocks((int)((imgW+31)/32), (int)(imgH+31)/32);
-    dim3 threads(16, 16);
+    dim3 blocks((int)((imgW+15)/16), (int)(imgH+15)/16);
+    dim3 threads(32, 32);
 
     //call the kernel function
     sobelGpu <<<blocks,threads>>> (d_in, d_out, imgH, imgW, d_sobel_x, d_sobel_y);
