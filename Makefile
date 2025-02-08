@@ -1,7 +1,7 @@
 # Compiler & Flags
 NVCC = nvcc
 
-OPENCV_PATH = 
+OPENCV_PATH = ../build_opencv
 
 CXXFLAGS = -I$(OPENCV_PATH)/include/opencv4
 LDFLAGS = -L$(OPENCV_PATH)/lib64 -lopencv_core -lopencv_imgcodecs -lopencv_highgui -lopencv_imgproc -lcudart

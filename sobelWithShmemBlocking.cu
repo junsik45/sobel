@@ -24,7 +24,7 @@ using namespace cv;
 */
 
 
-#define TILE_SIZE 16  // Tile size for shared memory optimization
+#define TILE_SIZE 32  // Tile size for shared memory optimization
 #define SOBEL_FILTER_SIZE 3  // Sobel kernel is 3x3
 
 __global__ void sobelGpu(
